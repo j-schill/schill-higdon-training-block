@@ -1,4 +1,5 @@
 import datetime
+from datetime import timedelta
 
 import altair as alt
 import pandas as pd
@@ -60,7 +61,7 @@ today_run = df[df["date"] == today]
 # -------------------------------
 
 st.sidebar.subheader("Pace Settings")
-from datetime import timedelta
+
 
 goal_marathon_time = st.sidebar.time_input(
     "Goal Marathon Time (HH:MM:SS)",
@@ -108,7 +109,7 @@ st.write(f"**{progress_pct}% complete** ({days_completed} / {days_total} days)")
 st.divider()
 
 # ---- NEXT 7 DAYS (ROLLING) ----------------------------------------
-st.subheader(f"Today: {today.strftime('%A, %B %d, %Y')}")
+st.subheader(f"Today: {today.strftime('%a, %b %d, %Y')}")
 # Build a rolling window: today + next 6 days
 
 # Responsive grid: replace the st.columns loop with this
