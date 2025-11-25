@@ -175,6 +175,7 @@ for day in days:
 html.append("</div>")
 st.markdown("".join(html), unsafe_allow_html=True)
 
+st.divider()
 
 rec = get_recommended_lift_of_the_week(current_week)
 
