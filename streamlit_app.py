@@ -150,9 +150,9 @@ for col, day in zip(cols, days):
                     min-height:120px;
                     color:#fff;
                 ">
-                    <strong>{r["dow"]}</strong><br>
+                    <strong>{r["dow"][:3]}</strong><br>
                     {r["date"].strftime("%m/%d")}<br><br>
-                    <div style="font-size:28px; font-weight:700; line-height:1;">{r["distance"]} mi</div>
+                    <div style="font-size:20px; font-weight:700; line-height:1;">{r["distance"]} mi</div>
                     <div style="margin-top:6px; font-style:italic">{r["Type"]}</div>
                     {"<div style='margin-top:8px'><strong>Pace:</strong> " + long_run_pace_range + "</div>" if is_long else ""}
                 </div>
