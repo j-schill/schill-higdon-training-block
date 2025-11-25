@@ -111,56 +111,68 @@ st.divider()
 st.subheader(f"Today: {today.strftime('%A, %B %d, %Y')}")
 # Build a rolling window: today + next 6 days
 
-cols = st.columns(7)
+# Responsive grid: replace the st.columns loop with this
+grid_css = """
+<style>
+.day-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+.day-tile {
+  padding: 12px;
+  border-radius: 8px;
+  min-height: 120px;
+  color: #fff;
+  text-align: center;
+}
+@media (max-width: 1200px) {
+  .day-grid { grid-template-columns: repeat(5, 1fr); }
+}
+@media (max-width: 900px) {
+  .day-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 600px) {
+  .day-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 420px) {
+  .day-grid { grid-template-columns: 1fr; }
+}
+</style>
+"""
 
-for col, day in zip(cols, days):
-    # find run for the day
+html = [grid_css, '<div class="day-grid">']
+
+for day in days:
     day_row = df[df["date"] == day]
-    is_today = day == today
-    with col:
-        if len(day_row) == 0:
-            # no run scheduled
-            st.markdown(
-                f"""
-                <div style="
-                    background-color:#374151;
-                    padding:12px;
-                    border-radius:8px;
-                    min-height:120px;
-                    color:#fff;
-                    text-align:center;
-                ">
-                    <strong>{day.strftime("%a")}</strong><br>
-                    {day.strftime("%m/%d")}<br><br>
-                    <em>Missing Data</em>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-        else:
-            r = day_row.iloc[0]
-            run_type_key = r["Type"].lower()
-            bg = TYPE_COLORS.get(run_type_key, "#374151")
-            is_long = run_type_key == "long"
+    if len(day_row) == 0:
+        bg = "#374151"
+        content = f"<strong>{day.strftime('%a')}</strong><br>{day.strftime('%m/%d')}<br><br><em>Missing Data</em>"
+    else:
+        r = day_row.iloc[0]
+        run_type_key = r["Type"].lower()
+        bg = TYPE_COLORS.get(run_type_key, "#374151")
+        is_long = run_type_key == "long"
+        lr = (
+            f"<div style='margin-top:8px;'><strong>Pace:</strong> {long_run_pace_range}</div>"
+            if is_long
+            else ""
+        )
+        content = (
+            f"<strong>{r['dow'][:3]}</strong><br>"
+            f"{r['date'].strftime('%m/%d')}<br><br>"
+            f"<div style='font-size:20px; font-weight:700; line-height:1;'>{r['distance']} mi</div>"
+            f"<div style='margin-top:6px; font-style:italic'>{r['Type']}</div>"
+            f"{lr}"
+        )
 
-            st.markdown(
-                f"""
-                <div style="
-                    background-color:{bg};
-                    padding:12px;
-                    border-radius:12px;
-                    min-height:120px;
-                    color:#fff;
-                ">
-                    <strong>{r["dow"][:3]}</strong><br>
-                    {r["date"].strftime("%m/%d")}<br><br>
-                    <div style="font-size:20px; font-weight:700; line-height:1;">{r["distance"]} mi</div>
-                    <div style="margin-top:6px; font-style:italic">{r["Type"]}</div>
-                    {"<div style='margin-top:8px'><strong>Pace:</strong> " + long_run_pace_range + "</div>" if is_long else ""}
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
+    # inline background color so each tile keeps its color
+    tile_html = f"<div class='day-tile' style='background-color:{bg};'>{content}</div>"
+    html.append(tile_html)
+
+html.append("</div>")
+st.markdown("".join(html), unsafe_allow_html=True)
 
 
 rec = get_recommended_lift_of_the_week(current_week)
