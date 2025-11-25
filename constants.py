@@ -6,19 +6,20 @@ TYPE_COLORS = {
     "pace": "#dc2626",  # red
     "cross": "#059669",  # green
     "rest": "#4b5563",  # gray
+    "race": "#d97706",  # amber
 }
 
 
 RECOMMENDED_LIFT_OTW = {
-    "legs": ["3 sets of 10 squats", "3 sets of 10 lunges", "3 sets of 10 calf raises"],
+    "legs": ["3x 10 squats", "3x 10 alt. lunges", "3x 10 calf raises"],
     "core": [
-        "3 sets of 15 sit-ups",
-        "3 sets of 15 leg raises",
-        "3 sets of 30-second planks",
+        "3x 15 sit-ups",
+        "3x 15 leg raises",
+        "2x 60-second planks",
     ],
     "upper body": [
-        "3 sets of 10 push-ups",
-        "3 sets of 10 dumbbell rows",
-        "3 sets of 10 shoulder presses",
+        "3x 10 push-ups",
+        "3x 10 dumbbell rows",
+        "3x 10 shoulder presses",
     ],
 }
