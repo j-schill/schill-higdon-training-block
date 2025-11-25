@@ -19,26 +19,27 @@ df = pd.read_csv("data/higdon_intermediate1.csv")
 df["date"] = pd.to_datetime(df["date"])
 df = df.sort_values("date")
 
-today = pd.Timestamp("2026-02-04")
+# Training start & end
+start_date = df["date"].min()
+end_date = df["date"].max()
 
+# default to today's date (normalized) and clamp to plan start
+today = pd.Timestamp.now().normalize()
+if today < start_date:
+    today = start_date
+
+# Lock plan out at max date
+if today > end_date:
+    today = end_date
 
 # Streamlit slider wants native datetime.date (or datetime); convert to/from pandas Timestamp
 selected_date = st.sidebar.slider(
     "Date Selector",
-    min_value=df["date"].min().date(),
-    max_value=df["date"].max().date(),
+    min_value=start_date.date(),
+    max_value=end_date.date(),
     value=today.date(),
     format="MM/DD/YYYY",
 )
-today = pd.Timestamp(selected_date)
-
-# Lock plan out at max date
-if today > df["date"].max():
-    today = df["date"].max()
-
-# Training start & end
-start_date = df["date"].min()
-end_date = df["date"].max()
 
 # Key metadata
 start_day = today
@@ -59,9 +60,12 @@ today_run = df[df["date"] == today]
 # -------------------------------
 
 st.sidebar.subheader("Pace Settings")
+from datetime import timedelta
 
 goal_marathon_time = st.sidebar.time_input(
-    "Goal Marathon Time (HH:MM:SS)", value=datetime.time(hour=3, minute=40)
+    "Goal Marathon Time (HH:MM:SS)",
+    value=datetime.time(hour=3, minute=40),
+    step=timedelta(seconds=60),
 )
 
 # Convert marathon goal time to minutes per mile
@@ -114,8 +118,6 @@ for col, day in zip(cols, days):
     day_row = df[df["date"] == day]
     is_today = day == today
     with col:
-        # slightly larger styling for today's tile
-        min_height = 200 if is_today else 120
         if len(day_row) == 0:
             # no run scheduled
             st.markdown(
@@ -130,7 +132,7 @@ for col, day in zip(cols, days):
                 ">
                     <strong>{day.strftime("%a")}</strong><br>
                     {day.strftime("%m/%d")}<br><br>
-                    <em>Rest</em>
+                    <em>Missing Data</em>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -145,7 +147,7 @@ for col, day in zip(cols, days):
                 f"""
                 <div style="
                     background-color:{bg};
-                    padding:16px;
+                    padding:12px;
                     border-radius:12px;
                     min-height:120px;
                     color:#fff;
